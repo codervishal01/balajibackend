@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { apiUrl } from '@/lib/api';
 
 const Footer = () => {
   const [footerData, setFooterData] = useState<any>(null);
@@ -11,14 +11,13 @@ const Footer = () => {
   }, []);
 
   const fetchFooterData = async () => {
-    const { data } = await supabase
-      .from('website_content')
-      .select('*')
-      .eq('section', 'footer_info')
-      .single();
-
-    if (data?.content) {
-      setFooterData(data.content);
+    try {
+      const res = await fetch(apiUrl('/api/site-info'));
+      const data = await res.json();
+      const footerEntry = data.find((entry: any) => entry.key === 'footer_info');
+      setFooterData(footerEntry ? JSON.parse(footerEntry.value) : null);
+    } catch (error) {
+      setFooterData(null);
     }
   };
 
@@ -27,8 +26,8 @@ const Footer = () => {
     company_name: "Balaji Healthcare",
     description: "Bringing you authentic Ayurvedic medicines and holistic wellness solutions for a healthier, more balanced life.",
     phone: "8279277040",
-    email: "info@balajiheathcare.com",
-    address: "123 Wellness Street\nBalaji City, India"
+    email: "Balajihealthcare@myyahoo.com",
+    address: "Kota Rajasthan, India"
   };
 
   const data = footerData || defaultData;

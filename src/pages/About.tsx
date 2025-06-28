@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Heart, Shield, Award, Users, Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { apiUrl } from '@/lib/api';
 
 const About = () => {
   const [aboutContent, setAboutContent] = useState<any>({});
@@ -12,17 +12,16 @@ const About = () => {
   }, []);
 
   const fetchAboutContent = async () => {
-    const { data } = await supabase
-      .from('website_content')
-      .select('*')
-      .in('section', ['about_hero', 'about_journey', 'about_stats', 'about_team']);
-
-    if (data) {
-      const contentMap = data.reduce((acc, item) => {
-        acc[item.section] = item;
+    try {
+      const res = await fetch(apiUrl('/api/site-info'));
+      const data = await res.json();
+      const contentMap = data.reduce((acc: any, item: any) => {
+        acc[item.key] = item.value ? JSON.parse(item.value) : null;
         return acc;
       }, {});
       setAboutContent(contentMap);
+    } catch (error) {
+      setAboutContent({});
     }
   };
 
@@ -206,42 +205,6 @@ const About = () => {
                   </div>
                   <h3 className="font-semibold text-lg text-foreground">{value.title}</h3>
                   <p className="text-muted-foreground text-sm">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Our Team */}
-      <section className="py-16 bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
-              {teamContent.title}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {teamContent.description}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamContent.content?.team?.map((member: any, index: number) => (
-              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <CardContent className="p-6 space-y-4">
-                  <div className="relative w-24 h-24 mx-auto">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-foreground">{member.name}</h3>
-                    <p className="text-primary font-medium">{member.role}</p>
-                    <p className="text-sm text-muted-foreground">{member.experience}</p>
-                    <p className="text-sm text-muted-foreground">{member.specialization}</p>
-                  </div>
                 </CardContent>
               </Card>
             ))}

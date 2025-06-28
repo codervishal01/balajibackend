@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter } from 'lucide-react';
+import { apiUrl, getImageUrl } from '@/lib/api';
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchProducts();
@@ -17,16 +18,12 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const res = await fetch(apiUrl('/api/products'));
+      if (!res.ok) throw new Error('Failed to fetch products');
+      const data = await res.json();
       setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error fetching products');
     } finally {
       setLoading(false);
     }
@@ -46,7 +43,7 @@ const Products = () => {
     id: product.id,
     name: product.name,
     description: product.description,
-    image: product.image_url,
+    image: getImageUrl(product.image),
     benefits: product.benefits || [],
     category: product.category,
     rating: product.rating,
@@ -54,14 +51,11 @@ const Products = () => {
   }));
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading products...</p>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">Loading products...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
   }
 
   return (

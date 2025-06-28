@@ -54,19 +54,6 @@ const Navigation = () => {
 
           {/* Admin Link and Call Button */}
           <div className="hidden md:flex items-center space-x-3">
-            {user && isAdmin && (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/admin" className="flex items-center space-x-2">
-                  <Settings className="h-4 w-4" />
-                  <span>Admin</span>
-                </Link>
-              </Button>
-            )}
-            {!user && (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/auth">Admin Login</Link>
-              </Button>
-            )}
             <Button 
               size="lg"
               asChild 
@@ -108,24 +95,6 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
-              {user && isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                >
-                  Admin Panel
-                </Link>
-              )}
-              {!user && (
-                <Link
-                  to="/auth"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                >
-                  Admin Login
-                </Link>
-              )}
               <div className="pt-2">
                 <Button 
                   size="lg"

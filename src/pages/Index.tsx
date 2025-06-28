@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Leaf, Shield, Heart, Star } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import AutoSlidingReviewCarousel from '@/components/AutoSlidingReviewCarousel';
+import { apiUrl } from '@/lib/api';
 
 // Lazy load heavy components
 const ProductCarousel = lazy(() => import('@/components/ProductCarousel'));
@@ -14,9 +16,11 @@ const Index = () => {
   const [featuredProductsContent, setFeaturedProductsContent] = useState<any>(null);
   const [testimonialsContent, setTestimonialsContent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
 
   useEffect(() => {
     fetchHomePageContent();
+    fetchAllProducts();
   }, []);
 
   const fetchHomePageContent = async () => {
@@ -42,6 +46,16 @@ const Index = () => {
       console.error('Error fetching content:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAllProducts = async () => {
+    try {
+      const res = await fetch(apiUrl('/api/products'));
+      const data = await res.json();
+      setAllProducts(data || []);
+    } catch (error) {
+      setAllProducts([]);
     }
   };
 
@@ -146,16 +160,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Premium Hero Carousel */}
-      <HeroCarousel />
+      {/* Hero/Banner Section */}
+      <section className="bg-gradient-to-r from-primary/10 to-accent/10 py-4">
+        <div className="w-full px-0">
+          <HeroCarousel heightClass="h-40 md:h-56 lg:h-60" />
+        </div>
+      </section>
 
       {/* About Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/10 to-accent/10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-4">
+      <section className="py-3">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 text-center">
+          <h2 className="text-xl md:text-2xl font-heading font-bold text-foreground mb-2">
             About Balaji HealthCare
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+          <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-2">
             Bridging ancient Ayurvedic wisdom with modern wellness needs, Balaji HealthCare offers authentic, natural solutions for your holistic health. Our mission is to empower you to live a healthier, more balanced life through time-tested remedies and expert guidance.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
@@ -184,36 +202,47 @@ const Index = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section id="products" className="py-16 bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <section id="products" className="py-4 bg-secondary/30">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="text-center mb-2">
+            <h2 className="text-lg md:text-xl font-bold text-foreground mb-1">
               {featuredProductsContent?.title || "Featured Products"}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
               {featuredProductsContent?.description || "Discover our most popular Ayurvedic formulations, crafted with authentic ingredients and time-tested recipes."}
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-2">
             {isLoading ? (
-              Array.from({ length: 3 }).map((_, index) => (
+              Array.from({ length: 5 }).map((_, index) => (
                 <ProductSkeleton key={index} />
               ))
             ) : (
-              featuredProducts.map((product: any) => (
-                <ProductCard key={product.id} product={product} />
+              allProducts.map((product: any) => (
+                <ProductCard key={product.id} product={product} compact />
               ))
             )}
           </div>
-
           <div className="text-center">
-            <Button size="lg" variant="outline" className="hover:bg-primary hover:text-white" asChild>
+            <Button size="sm" variant="outline" className="hover:bg-primary hover:text-white" asChild>
               <a href="/products" className="flex items-center space-x-2">
                 <span>View All Products</span>
                 <ArrowRight className="h-5 w-5" />
               </a>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Sliding Reviews Section */}
+      <section className="py-3 bg-gradient-to-br from-accent/10 to-primary/5">
+        <div className="max-w-3xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="relative">
+            <div className="w-full overflow-hidden rounded-2xl shadow-xl">
+              <div className="relative">
+                <AutoSlidingReviewCarousel imagesOnly compact={false} />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -263,44 +292,6 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-16 bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {testimonialsContent?.title || "What Our Customers Say"}
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {testimonialsContent?.description || "Real experiences from people who chose natural healing"}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {isLoading ? (
-              Array.from({ length: 3 }).map((_, index) => (
-                <TestimonialSkeleton key={index} />
-              ))
-            ) : (
-              testimonials.map((testimonial: any, index: number) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className="flex items-center space-x-1 text-yellow-400">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-current" />
-                      ))}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-muted-foreground italic">"{testimonial.text}"</p>
-                    <p className="font-semibold">- {testimonial.name}</p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
           </div>
         </div>
       </section>

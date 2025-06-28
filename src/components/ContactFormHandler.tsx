@@ -1,6 +1,4 @@
-
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
+import { apiUrl } from '@/lib/api';
 
 const ContactFormHandler = () => {
   const [formData, setFormData] = useState({
@@ -37,26 +36,23 @@ const ContactFormHandler = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const { error } = await supabase
-        .from('contact_messages')
-        .insert({
+      const res = await fetch(apiUrl('/api/contact'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           first_name: formData.firstName,
           last_name: formData.lastName,
-          email: 'noemail@provided.com', // Default email since field is required in database
           phone: formData.phone,
           subject: formData.problem,
           message: formData.message || 'No message provided'
-        });
-
-      if (error) throw error;
-
+        })
+      });
+      if (!res.ok) throw new Error('Failed to send message');
       toast({
-        title: "Message Sent!",
+        title: 'Message Sent!',
         description: "We'll get back to you within 24 hours."
       });
-
       setFormData({
         firstName: '',
         lastName: '',
@@ -66,9 +62,9 @@ const ContactFormHandler = () => {
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: error.message,
-        variant: "destructive"
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);

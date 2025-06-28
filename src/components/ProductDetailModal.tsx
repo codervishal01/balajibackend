@@ -2,6 +2,7 @@ import { Phone, MessageCircle, Star, Leaf, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { getImageUrl } from '@/lib/api';
 
 interface ProductDetailModalProps {
   product: {
@@ -41,12 +42,11 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
             {/* Product Image */}
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-lg">
-                <AspectRatio ratio={1}>
+                <AspectRatio ratio={1.5}>
                   <img
-                    src={product.image}
+                    src={getImageUrl(product.image)}
                     alt={product.name}
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: 'center' }}
+                    className="w-full h-88 object-cover rounded-t-lg"
                   />
                 </AspectRatio>
                 <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">

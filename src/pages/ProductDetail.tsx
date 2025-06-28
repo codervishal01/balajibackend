@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -8,12 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Phone, MessageCircle, Star, Leaf, ArrowLeft, Shield, Heart, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { apiUrl, getImageUrl } from '@/lib/api';
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  image_url: string;
+  benefits: string[];
+  category: string;
+  rating: number;
+  reviews: number;
+  price?: number;
+}
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -24,15 +37,20 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .eq('is_active', true)
-        .single();
-
-      if (error) throw error;
-      setProduct(data);
+      const res = await fetch(apiUrl('/api/products'));
+      if (!res.ok) throw new Error('Failed to fetch products');
+      const products = await res.json();
+      const foundProduct = products.find((p: Product) => p.id.toString() === id);
+      if (foundProduct) {
+        // Transform the product to match the expected format
+        setProduct({
+          ...foundProduct,
+          image_url: foundProduct.image ? (foundProduct.image.startsWith('/uploads/') ? foundProduct.image : `/uploads/${foundProduct.image}`) : '',
+          benefits: foundProduct.benefits || [],
+          rating: foundProduct.rating || 4.5,
+          reviews: foundProduct.reviews || 0
+        });
+      }
     } catch (error) {
       console.error('Error fetching product:', error);
     } finally {
@@ -42,14 +60,20 @@ const ProductDetail = () => {
 
   const fetchRelatedProducts = async () => {
     try {
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .neq('id', id)
-        .limit(3);
-
-      setRelatedProducts(data || []);
+      const res = await fetch(apiUrl('/api/products'));
+      if (!res.ok) throw new Error('Failed to fetch products');
+      const products = await res.json();
+      const filteredProducts = products
+        .filter((p: Product) => p.id.toString() !== id)
+        .slice(0, 3)
+        .map((p: Product) => ({
+          ...p,
+          image_url: p.image ? (p.image.startsWith('/uploads/') ? p.image : `/uploads/${p.image}`) : '',
+          benefits: p.benefits || [],
+          rating: p.rating || 4.5,
+          reviews: p.reviews || 0
+        }));
+      setRelatedProducts(filteredProducts);
     } catch (error) {
       console.error('Error fetching related products:', error);
     }
@@ -110,7 +134,7 @@ const ProductDetail = () => {
             <div className="relative overflow-hidden rounded-lg">
               <AspectRatio ratio={1}>
                 <img
-                  src={product.image_url}
+                  src={getImageUrl(product.image_url)}
                   alt={product.name}
                   className="w-full h-full object-cover"
                   style={{ objectPosition: 'center' }}
@@ -118,7 +142,7 @@ const ProductDetail = () => {
               </AspectRatio>
               <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                 <Leaf className="h-4 w-4 mr-2" />
-                {product.category}
+                {product.category || 'Ayurvedic'}
               </Badge>
             </div>
           </div>
@@ -231,7 +255,7 @@ const ProductDetail = () => {
                     <div className="relative overflow-hidden rounded-t-lg">
                       <AspectRatio ratio={4/3}>
                         <img
-                          src={relatedProduct.image_url}
+                          src={getImageUrl(relatedProduct.image_url)}
                           alt={relatedProduct.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           style={{ objectPosition: 'center' }}
@@ -239,7 +263,7 @@ const ProductDetail = () => {
                       </AspectRatio>
                       <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
                         <Leaf className="h-3 w-3 mr-1" />
-                        {relatedProduct.category}
+                        {relatedProduct.category || 'Ayurvedic'}
                       </Badge>
                     </div>
                   </CardHeader>
