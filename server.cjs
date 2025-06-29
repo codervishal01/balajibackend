@@ -49,6 +49,29 @@ mongoose.connect(MONGO_URI, {
   console.error('MongoDB connection error:', err);
 });
 
+// Add robust MongoDB connection event listeners
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected! Attempting to reconnect...');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('MongoDB reconnected!');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+// Periodic ping to keep MongoDB connection alive (every 5 minutes)
+setInterval(async () => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    // console.log('MongoDB ping successful'); // Uncomment for debug
+  } catch (err) {
+    console.error('MongoDB ping failed:', err);
+  }
+}, 5 * 60 * 1000); // 5 minutes
+
 // MongoDB Models
 const adminSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
