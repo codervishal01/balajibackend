@@ -40,15 +40,19 @@ const ProductDetail = () => {
       const res = await fetch(apiUrl('/api/products'));
       if (!res.ok) throw new Error('Failed to fetch products');
       const products = await res.json();
-      const foundProduct = products.find((p: Product) => p.id.toString() === id);
+      const foundProduct = products.find(
+        (p: any) =>
+          (p.id && p.id.toString() === id) ||
+          (p._id && p._id.toString() === id)
+      );
       if (foundProduct) {
-        // Transform the product to match the expected format
         setProduct({
           ...foundProduct,
-          image_url: foundProduct.image ? (foundProduct.image.startsWith('/uploads/') ? foundProduct.image : `/uploads/${foundProduct.image}`) : '',
+          image_url: foundProduct.image || '',
           benefits: foundProduct.benefits || [],
           rating: foundProduct.rating || 4.5,
-          reviews: foundProduct.reviews || 0
+          reviews: foundProduct.reviews || 0,
+          id: foundProduct.id ?? foundProduct._id,
         });
       }
     } catch (error) {

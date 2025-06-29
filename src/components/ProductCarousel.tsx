@@ -67,17 +67,43 @@ const ProductCarousel = () => {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                     </div>
                   </CardHeader>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col gap-2 min-h-[370px]">
                     <h3 className="font-bold text-lg mb-1">{product.name}</h3>
                     <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{product.description}</p>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-primary font-semibold">₹{product.price}</span>
                     </div>
-                    <Link to={`/product/${product.id}`} className="block w-full">
-                      <Button className="w-full mt-2" variant="outline">
-                        View Details
+                    <div className="flex flex-col gap-2 mt-2">
+                      <Link to={`/product/${product.id ?? product._id}`} className="block w-full">
+                        <Button className="w-full" variant="outline">
+                          View Details
+                        </Button>
+                      </Link>
+                      <Button
+                        className="w-full"
+                        variant="outline"
+                        asChild
+                      >
+                        <a href={`tel:8279277040`} className="flex items-center justify-center space-x-1">
+                          <Phone className="h-4 w-4" />
+                          <span>Call Now</span>
+                        </a>
                       </Button>
-                    </Link>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+                        asChild
+                      >
+                        <a
+                          href={`https://wa.me/8279277040?text=${encodeURIComponent(`Hi, I'm interested in ${product.name}. Can you provide more details?`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center space-x-1"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          <span>WhatsApp</span>
+                        </a>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </CarouselItem>

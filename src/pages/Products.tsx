@@ -39,16 +39,18 @@ const Products = () => {
   });
 
   // Transform products to match the expected format
-  const transformedProducts = filteredProducts.map(product => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    image: getImageUrl(product.image),
-    benefits: product.benefits || [],
-    category: product.category,
-    rating: product.rating,
-    reviews: product.reviews
-  }));
+  const transformedProducts = filteredProducts
+    .filter(product => (product.id !== undefined && product.id !== null) || (product._id !== undefined && product._id !== null))
+    .map(product => ({
+      id: product.id ?? product._id,
+      name: product.name,
+      description: product.description,
+      image: getImageUrl(product.image),
+      benefits: product.benefits || [],
+      category: product.category,
+      rating: product.rating,
+      reviews: product.reviews
+    }));
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading products...</div>;

@@ -24,10 +24,10 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
   const whatsappMessage = `Hi, I'm interested in ${product.name}. Can you provide more details?`;
 
   return (
-    <Card className={`group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 overflow-hidden ${compact ? 'p-1' : ''}`}>
-      <div className="flex flex-col sm:flex-row">
+    <Card className={`group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 overflow-hidden ${compact ? 'p-1' : ''} min-w-[280px] max-w-[350px] mx-auto`}>
+      <div className="flex flex-col">
         {/* Image Section */}
-        <div className="sm:w-1/2 w-full flex items-center justify-center bg-white p-2">
+        <div className="w-full flex items-center justify-center bg-white p-2">
           <div className="relative w-full">
             <img
               src={getImageUrl(product.image)}
@@ -46,7 +46,7 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
           </div>
         </div>
         {/* Text Section */}
-        <div className="sm:w-1/2 w-full flex flex-col justify-between">
+        <div className="w-full flex flex-col justify-between">
           <CardContent className={`space-y-1 ${compact ? 'p-1 text-[11px]' : 'p-4 sm:p-6'}`}>
             <div>
               <h3 className={`font-heading font-semibold text-foreground group-hover:text-primary transition-colors duration-200 ${compact ? 'text-xs' : 'text-lg sm:text-xl'}`}>
@@ -75,15 +75,17 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
           <CardFooter className={`pt-0 space-y-1 ${compact ? 'p-1' : 'p-4 sm:p-6'} flex-col gap-1 w-full`}>
             <div className="flex flex-col gap-1 w-full">
               {/* View Details Button */}
-              <Button
-                size={compact ? 'sm' : 'lg'}
-                className={`w-full font-semibold py-2 px-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${compact ? 'text-xs' : ''}`}
-                asChild
-              >
-                <Link to={`/product/${product.id}`}>
-                  View Details
-                </Link>
-              </Button>
+              {(product.id ?? product._id) !== undefined && (product.id ?? product._id) !== null && (
+                <Button
+                  size={compact ? 'sm' : 'lg'}
+                  className={`w-full font-semibold py-2 px-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${compact ? 'text-xs' : ''}`}
+                  asChild
+                >
+                  <Link to={`/product/${product.id ?? product._id}`}>
+                    View Details
+                  </Link>
+                </Button>
+              )}
               {/* Call Now Button */}
               <Button
                 size={compact ? 'sm' : 'lg'}

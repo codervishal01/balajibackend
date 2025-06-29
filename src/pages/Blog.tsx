@@ -71,43 +71,48 @@ const Blog = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post) => (
-                <Card key={post.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardHeader className="p-0">
-                    <div className="relative overflow-hidden">
-                      {post.image_url && (
-                        <img
-                          src={getImageUrl(post.image_url)}
-                          alt={post.title}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    <h3 className="font-heading text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    {post.excerpt && (
-                      <p className="text-muted-foreground text-sm line-clamp-3">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{post.author}</span>
-                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Button size="sm" variant="ghost" className="hover:text-primary" asChild>
-                        <Link to={`/blog/${post.id}`}>
-                          Read More
-                          <ArrowRight className="h-3 w-3 ml-1" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {blogPosts
+                .filter(post => (post.id !== undefined && post.id !== null) || (post._id !== undefined && post._id !== null))
+                .map(post => {
+                  const postId = post.id ?? post._id;
+                  return (
+                    <Card key={postId} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <CardHeader className="p-0">
+                        <div className="relative overflow-hidden">
+                          {post.image_url && (
+                            <img
+                              src={getImageUrl(post.image_url)}
+                              alt={post.title}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-6 space-y-4">
+                        <h3 className="font-heading text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">
+                          {post.title}
+                        </h3>
+                        {post.excerpt && (
+                          <p className="text-muted-foreground text-sm line-clamp-3">
+                            {post.excerpt}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{post.author}</span>
+                          <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Button size="sm" variant="ghost" className="hover:text-primary" asChild>
+                            <Link to={`/blog/${postId}`}>
+                              Read More
+                              <ArrowRight className="h-3 w-3 ml-1" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
             </div>
           </div>
         </section>

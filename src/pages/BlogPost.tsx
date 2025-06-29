@@ -35,10 +35,17 @@ const BlogPost = () => {
       const res = await fetch(apiUrl('/api/blog-posts'));
       if (!res.ok) throw new Error('Failed to fetch blog posts');
       const posts = await res.json();
-      const foundPost = posts.find((p: BlogPost) => p.id.toString() === id && p.is_published);
+      const foundPost = posts.find(
+        (p: any) =>
+          ((p.id && p.id.toString() === id) || (p._id && p._id.toString() === id)) &&
+          p.is_published
+      );
       
       if (foundPost) {
-        setPost(foundPost);
+        setPost({
+          ...foundPost,
+          id: foundPost.id ?? foundPost._id,
+        });
       }
     } catch (error) {
       console.error('Error fetching blog post:', error);

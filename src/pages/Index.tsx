@@ -212,14 +212,14 @@ const Index = () => {
               {featuredProductsContent?.description || "Discover our most popular Ayurvedic formulations, crafted with authentic ingredients and time-tested recipes."}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-2 justify-center">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <ProductSkeleton key={index} />
               ))
             ) : (
               allProducts.map((product: any) => (
-                <ProductCard key={product.id} product={product} compact />
+                <ProductCard key={product.id} product={product} />
               ))
             )}
           </div>
