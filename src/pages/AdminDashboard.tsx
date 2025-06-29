@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiUrl, getImageUrl } from '@/lib/api';
 
 interface Product {
-  id: number;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -11,34 +11,34 @@ interface Product {
 }
 
 interface Banner {
-  id: number;
+  _id: string;
   image: string;
   title: string;
   subtitle: string;
 }
 
 interface Review {
-  id: number;
+  _id: string;
   image: string;
   text: string;
 }
 
 interface SiteInfo {
-  id: number;
+  _id: string;
   key: string;
   value: string;
 }
 
 interface BlogPost {
-  id: number;
+  _id: string;
   title: string;
   content: string;
   excerpt: string;
   image_url: string;
   author: string;
-  is_published: number;
-  created_at: string;
-  updated_at: string;
+  is_published: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const AdminDashboard = () => {
@@ -217,7 +217,7 @@ const AdminDashboard = () => {
       const imagePath = await uploadImage();
       const token = localStorage.getItem('admin_token');
       const method = editingProduct ? 'PUT' : 'POST';
-      const url = editingProduct ? apiUrl(`/api/products/${editingProduct.id}`) : apiUrl('/api/products');
+      const url = editingProduct ? apiUrl(`/api/products/${editingProduct._id}`) : apiUrl('/api/products');
       const res = await fetch(url, {
         method,
         headers: {
@@ -257,7 +257,11 @@ const AdminDashboard = () => {
     setImageFile(null);
   };
 
-  const handleDeleteProduct = async (id: number) => {
+  const handleDeleteProduct = async (id: string) => {
+    if (!id || id === 'undefined') {
+      console.error('Invalid product ID:', id);
+      return;
+    }
     if (!window.confirm('Delete this product?')) return;
     const token = localStorage.getItem('admin_token');
     const res = await fetch(apiUrl(`/api/products/${id}`), {
@@ -302,7 +306,7 @@ const AdminDashboard = () => {
       const imagePath = await uploadBannerImage();
       const token = localStorage.getItem('admin_token');
       const method = editingBanner ? 'PUT' : 'POST';
-      const url = editingBanner ? apiUrl(`/api/banners/${editingBanner.id}`) : apiUrl('/api/banners');
+      const url = editingBanner ? apiUrl(`/api/banners/${editingBanner._id}`) : apiUrl('/api/banners');
       const res = await fetch(url, {
         method,
         headers: {
@@ -340,7 +344,11 @@ const AdminDashboard = () => {
     setBannerImageFile(null);
   };
 
-  const handleDeleteBanner = async (id: number) => {
+  const handleDeleteBanner = async (id: string) => {
+    if (!id || id === 'undefined') {
+      console.error('Invalid banner ID:', id);
+      return;
+    }
     if (!window.confirm('Delete this banner?')) return;
     const token = localStorage.getItem('admin_token');
     const res = await fetch(apiUrl(`/api/banners/${id}`), {
@@ -385,7 +393,7 @@ const AdminDashboard = () => {
       const imagePath = await uploadReviewImage();
       const token = localStorage.getItem('admin_token');
       const method = editingReview ? 'PUT' : 'POST';
-      const url = editingReview ? apiUrl(`/api/reviews/${editingReview.id}`) : apiUrl('/api/reviews');
+      const url = editingReview ? apiUrl(`/api/reviews/${editingReview._id}`) : apiUrl('/api/reviews');
       const res = await fetch(url, {
         method,
         headers: {
@@ -421,7 +429,11 @@ const AdminDashboard = () => {
     setReviewImageFile(null);
   };
 
-  const handleDeleteReview = async (id: number) => {
+  const handleDeleteReview = async (id: string) => {
+    if (!id || id === 'undefined') {
+      console.error('Invalid review ID:', id);
+      return;
+    }
     if (!window.confirm('Delete this review?')) return;
     const token = localStorage.getItem('admin_token');
     const res = await fetch(apiUrl(`/api/reviews/${id}`), {
@@ -441,7 +453,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('admin_token');
       const method = editingSiteInfo ? 'PUT' : 'POST';
-      const url = editingSiteInfo ? apiUrl(`/api/site-info/${editingSiteInfo.key}`) : apiUrl('/api/site-info');
+      const url = editingSiteInfo ? apiUrl(`/api/site-info/${editingSiteInfo._id}`) : apiUrl('/api/site-info');
       const res = await fetch(url, {
         method,
         headers: {
@@ -475,10 +487,14 @@ const AdminDashboard = () => {
     setShowSiteInfoForm(true);
   };
 
-  const handleDeleteSiteInfo = async (key: string) => {
+  const handleDeleteSiteInfo = async (id: string) => {
+    if (!id || id === 'undefined') {
+      console.error('Invalid site info ID:', id);
+      return;
+    }
     if (!window.confirm('Delete this site info entry?')) return;
     const token = localStorage.getItem('admin_token');
-    const res = await fetch(apiUrl(`/api/site-info/${key}`), {
+    const res = await fetch(apiUrl(`/api/site-info/${id}`), {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -516,7 +532,7 @@ const AdminDashboard = () => {
       const imagePath = await uploadBlogImage();
       const token = localStorage.getItem('admin_token');
       const method = editingBlogPost ? 'PUT' : 'POST';
-      const url = editingBlogPost ? apiUrl(`/api/blog-posts/${editingBlogPost.id}`) : apiUrl('/api/blog-posts');
+      const url = editingBlogPost ? apiUrl(`/api/blog-posts/${editingBlogPost._id}`) : apiUrl('/api/blog-posts');
       const res = await fetch(url, {
         method,
         headers: {
@@ -554,13 +570,17 @@ const AdminDashboard = () => {
       excerpt: post.excerpt,
       image_url: post.image_url,
       author: post.author,
-      is_published: !!post.is_published,
+      is_published: post.is_published,
     });
     setShowBlogForm(true);
     setBlogImageFile(null);
   };
 
-  const handleDeleteBlogPost = async (id: number) => {
+  const handleDeleteBlogPost = async (id: string) => {
+    if (!id || id === 'undefined') {
+      console.error('Invalid blog post ID:', id);
+      return;
+    }
     if (!window.confirm('Delete this blog post?')) return;
     const token = localStorage.getItem('admin_token');
     const res = await fetch(apiUrl(`/api/blog-posts/${id}`), {
@@ -677,7 +697,7 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <tr key={product.id}>
+                    <tr key={product._id}>
                       <td className="p-2">
                         {product.image && (
                           <img src={product.image} alt={product.name} className="h-12" />
@@ -695,7 +715,7 @@ const AdminDashboard = () => {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteProduct(product.id)}
+                          onClick={() => handleDeleteProduct(product._id)}
                         >
                           Delete
                         </button>
@@ -786,7 +806,7 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {banners.map((banner) => (
-                    <tr key={banner.id}>
+                    <tr key={banner._id}>
                       <td className="p-2">
                         {banner.image && (
                           <img src={getImageUrl(banner.image)} alt={banner.title} className="h-12" />
@@ -803,7 +823,7 @@ const AdminDashboard = () => {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteBanner(banner.id)}
+                          onClick={() => handleDeleteBanner(banner._id)}
                         >
                           Delete
                         </button>
@@ -882,7 +902,7 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {reviews.map((review) => (
-                    <tr key={review.id}>
+                    <tr key={review._id}>
                       <td className="p-2">
                         {review.image && (
                           <img src={getImageUrl(review.image)} alt="Review" className="h-12" />
@@ -898,7 +918,7 @@ const AdminDashboard = () => {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteReview(review.id)}
+                          onClick={() => handleDeleteReview(review._id)}
                         >
                           Delete
                         </button>
@@ -1020,7 +1040,7 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {blogPosts.map((post) => (
-                    <tr key={post.id}>
+                    <tr key={post._id}>
                       <td className="p-2">{post.image_url && <img src={getImageUrl(post.image_url)} alt={post.title} className="h-12" />}</td>
                       <td className="p-2">{post.title}</td>
                       <td className="p-2">{post.excerpt}</td>
@@ -1035,7 +1055,7 @@ const AdminDashboard = () => {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteBlogPost(post.id)}
+                          onClick={() => handleDeleteBlogPost(post._id)}
                         >
                           Delete
                         </button>

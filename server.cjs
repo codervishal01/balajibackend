@@ -1,17 +1,37 @@
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
-require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/balaji_healthcare';
+
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dyjuf936l',
+  api_key: process.env.CLOUDINARY_API_KEY || '324417667382339',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'ZPlEBNUSwwkQZ4YaZAYfWJPtcl4'
+});
+
+// Alternative: Use CLOUDINARY_URL if provided
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config({
+    cloud_name: 'dyjuf936l',
+    api_key: '324417667382339',
+    api_secret: 'ZPlEBNUSwwkQZ4YaZAYfWJPtcl4'
+  });
+}
 
 // Middleware
 app.use(cors());
@@ -176,21 +196,23 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Multer setup
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+// Cloudinary storage configuration
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'balaji-healthcare',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 800, height: 600, crop: 'limit' }]
   }
 });
-const upload = multer({ storage: storage });
 
-// Image upload endpoint (admin only)
+// Multer setup with Cloudinary
+const upload = multer({ storage: cloudinaryStorage });
+
+// Image upload endpoint (admin only) - Cloudinary
 app.post('/api/upload', authenticateToken, (req, res) => {
   console.log('Upload endpoint hit');
+  
   upload.single('image')(req, res, function (err) {
     if (err) {
       console.error('Multer error:', err);
@@ -200,9 +222,23 @@ app.post('/api/upload', authenticateToken, (req, res) => {
       console.error('No file uploaded');
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    console.log('File uploaded:', req.file.filename);
-    res.json({ path: `/uploads/${req.file.filename}` });
+    console.log('File uploaded to Cloudinary:', req.file.filename);
+    console.log('Cloudinary URL:', req.file.path);
+    res.json({ path: req.file.path });
   });
+});
+
+// Get single product by ID
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
 // PRODUCTS CRUD
@@ -237,7 +273,11 @@ app.put('/api/products/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/products/:id', authenticateToken, async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    if (!id || id === 'undefined') {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
+    const product = await Product.findByIdAndDelete(id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     res.json({ message: 'Product deleted' });
   } catch (error) {
@@ -277,7 +317,11 @@ app.put('/api/banners/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/banners/:id', authenticateToken, async (req, res) => {
   try {
-    const banner = await Banner.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    if (!id || id === 'undefined') {
+      return res.status(400).json({ error: 'Invalid banner ID' });
+    }
+    const banner = await Banner.findByIdAndDelete(id);
     if (!banner) return res.status(404).json({ error: 'Banner not found' });
     res.json({ message: 'Banner deleted' });
   } catch (error) {
@@ -317,7 +361,11 @@ app.put('/api/reviews/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/reviews/:id', authenticateToken, async (req, res) => {
   try {
-    const review = await Review.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    if (!id || id === 'undefined') {
+      return res.status(400).json({ error: 'Invalid review ID' });
+    }
+    const review = await Review.findByIdAndDelete(id);
     if (!review) return res.status(404).json({ error: 'Review not found' });
     res.json({ message: 'Review deleted' });
   } catch (error) {
@@ -360,7 +408,11 @@ app.put('/api/site-info/:key', authenticateToken, async (req, res) => {
 
 app.delete('/api/site-info/:key', authenticateToken, async (req, res) => {
   try {
-    const siteInfo = await SiteInfo.findOneAndDelete({ key: req.params.key });
+    const key = req.params.key;
+    if (!key || key === 'undefined') {
+      return res.status(400).json({ error: 'Invalid site info key' });
+    }
+    const siteInfo = await SiteInfo.findOneAndDelete({ key });
     if (!siteInfo) return res.status(404).json({ error: 'Site info not found' });
     res.json({ message: 'Site info deleted' });
   } catch (error) {
@@ -400,7 +452,11 @@ app.put('/api/blog-posts/:id', authenticateToken, async (req, res) => {
 
 app.delete('/api/blog-posts/:id', authenticateToken, async (req, res) => {
   try {
-    const blogPost = await BlogPost.findByIdAndDelete(req.params.id);
+    const id = req.params.id;
+    if (!id || id === 'undefined') {
+      return res.status(400).json({ error: 'Invalid blog post ID' });
+    }
+    const blogPost = await BlogPost.findByIdAndDelete(id);
     if (!blogPost) return res.status(404).json({ error: 'Blog post not found' });
     res.json({ message: 'Blog post deleted' });
   } catch (error) {
