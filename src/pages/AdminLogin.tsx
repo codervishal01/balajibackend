@@ -43,6 +43,7 @@ const AdminLogin = () => {
             value={username}
             onChange={e => setUsername(e.target.value)}
             required
+            autoComplete="username"
           />
         </div>
         <div className="mb-6">
@@ -53,6 +54,7 @@ const AdminLogin = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
         </div>
         <button

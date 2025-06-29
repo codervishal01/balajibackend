@@ -217,6 +217,11 @@ const AdminDashboard = () => {
       const imagePath = await uploadImage();
       const token = localStorage.getItem('admin_token');
       const method = editingProduct ? 'PUT' : 'POST';
+      
+      if (editingProduct && (!editingProduct._id || editingProduct._id === 'undefined')) {
+        throw new Error('Invalid product ID for editing');
+      }
+      
       const url = editingProduct ? apiUrl(`/api/products/${editingProduct._id}`) : apiUrl('/api/products');
       const res = await fetch(url, {
         method,
@@ -306,6 +311,11 @@ const AdminDashboard = () => {
       const imagePath = await uploadBannerImage();
       const token = localStorage.getItem('admin_token');
       const method = editingBanner ? 'PUT' : 'POST';
+      
+      if (editingBanner && (!editingBanner._id || editingBanner._id === 'undefined')) {
+        throw new Error('Invalid banner ID for editing');
+      }
+      
       const url = editingBanner ? apiUrl(`/api/banners/${editingBanner._id}`) : apiUrl('/api/banners');
       const res = await fetch(url, {
         method,
@@ -393,6 +403,11 @@ const AdminDashboard = () => {
       const imagePath = await uploadReviewImage();
       const token = localStorage.getItem('admin_token');
       const method = editingReview ? 'PUT' : 'POST';
+      
+      if (editingReview && (!editingReview._id || editingReview._id === 'undefined')) {
+        throw new Error('Invalid review ID for editing');
+      }
+      
       const url = editingReview ? apiUrl(`/api/reviews/${editingReview._id}`) : apiUrl('/api/reviews');
       const res = await fetch(url, {
         method,
@@ -532,6 +547,11 @@ const AdminDashboard = () => {
       const imagePath = await uploadBlogImage();
       const token = localStorage.getItem('admin_token');
       const method = editingBlogPost ? 'PUT' : 'POST';
+      
+      if (editingBlogPost && (!editingBlogPost._id || editingBlogPost._id === 'undefined')) {
+        throw new Error('Invalid blog post ID for editing');
+      }
+      
       const url = editingBlogPost ? apiUrl(`/api/blog-posts/${editingBlogPost._id}`) : apiUrl('/api/blog-posts');
       const res = await fetch(url, {
         method,
