@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ContactFormHandler from '@/components/ContactFormHandler';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { apiUrl } from '@/lib/api';
+import Footer from '@/components/Footer';
 
 const Contact = () => {
   const [contactInfo, setContactInfo] = useState<any>(null);
@@ -79,6 +80,7 @@ const Contact = () => {
           style={{ maxWidth: '900px' }}
         />
       </div>
+      <Footer />
     </div>
   );
 };

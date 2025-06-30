@@ -24,10 +24,10 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   return (
-    <div className="w-full min-h-screen flex flex-col bg-background overflow-x-hidden">
+    <div className="w-screen min-h-screen flex flex-col bg-background overflow-x-hidden">
       <Navigation />
       <main className="flex-grow w-full">
-        <div className="max-w-screen-xl mx-auto w-full px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full px-0">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/products" element={<Products />} />

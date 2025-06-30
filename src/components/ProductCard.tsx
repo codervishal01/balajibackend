@@ -24,61 +24,62 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
   const whatsappMessage = `Hi, I'm interested in ${product.name}. Can you provide more details?`;
 
   return (
-    <Card className={`group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 overflow-hidden ${compact ? 'p-1' : ''} min-w-[280px] max-w-[350px] mx-auto`}>
+    <Card className={`group hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 border-none overflow-hidden rounded-2xl bg-white/90 backdrop-blur-md min-w-[280px] max-w-[370px] mx-auto`}>
       <div className="flex flex-col">
         {/* Image Section */}
-        <div className="w-full flex items-center justify-center bg-white p-2">
-          <div className="relative w-full">
-            <img
-              src={getImageUrl(product.image)}
-              alt={product.name}
-              className={`w-full h-60 sm:h-96 object-contain group-hover:scale-105 transition-transform duration-300 bg-white ${compact ? 'object-contain h-20' : ''}`}
-              style={{ objectPosition: 'center' }}
-            />
-            <Badge className={`absolute top-2 left-2 bg-primary text-primary-foreground ${compact ? 'text-[10px] px-1 py-0.5' : ''}`}>
-              <Leaf className="h-4 w-2 mr-1" />
-              {product.category}
-            </Badge>
-            <div className={`absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center space-x-1 ${compact ? 'text-[10px]' : ''}`}>
-              <Star className="h-2 w-2 text-yellow-400 fill-current" />
-              <span className="font-semibold">{product.rating}</span>
-            </div>
+        <div className="relative w-full h-56 md:h-64 lg:h-72 overflow-hidden">
+          <img
+            src={getImageUrl(product.image)}
+            alt={product.name}
+            className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          {/* Category Badge */}
+          <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+            <Leaf className="h-4 w-4 mr-1" />
+            {product.category}
+          </Badge>
+          {/* Best Seller Badge (demo) */}
+          <Badge className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full shadow-lg font-bold">Best Seller</Badge>
+          {/* Rating */}
+          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1 shadow-lg">
+            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+            <span className="font-semibold text-sm">{product.rating}</span>
           </div>
         </div>
         {/* Text Section */}
         <div className="w-full flex flex-col justify-between">
-          <CardContent className={`space-y-1 ${compact ? 'p-1 text-[11px]' : 'p-4 sm:p-6'}`}>
-            <div>
-              <h3 className={`font-heading font-semibold text-foreground group-hover:text-primary transition-colors duration-200 ${compact ? 'text-xs' : 'text-lg sm:text-xl'}`}>
-                {product.name}
-              </h3>
-              <p className={`text-muted-foreground mt-1 line-clamp-2 ${compact ? 'text-[10px]' : 'text-sm'}`}>
-                {product.description}
-              </p>
-            </div>
+          <CardContent className="space-y-2 p-4 md:p-6">
+            <h3 className="font-heading font-bold text-foreground group-hover:text-primary transition-colors duration-200 text-lg md:text-xl truncate">
+              {product.name}
+            </h3>
+            <p className="text-muted-foreground mt-1 line-clamp-2 text-sm md:text-base">
+              {product.description}
+            </p>
             <div className="space-y-1">
-              <h4 className={`font-semibold ${compact ? 'text-[10px]' : 'text-sm'} text-foreground`}>Key Benefits:</h4>
+              <h4 className="font-semibold text-xs md:text-sm text-foreground">Key Benefits:</h4>
               <ul className="space-y-0.5">
                 {(product.benefits || []).slice(0, 3).map((benefit, index) => (
-                  <li key={index} className={`flex items-center space-x-1 ${compact ? 'text-[10px]' : 'text-xs'}`}>
-                    <div className="w-1 h-1 bg-primary rounded-full flex-shrink-0" />
+                  <li key={index} className="flex items-center space-x-1 text-xs md:text-sm">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" />
                     <span>{benefit}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className={`flex items-center justify-between text-muted-foreground ${compact ? 'text-[10px]' : 'text-xs'}`}>
+            <div className="flex items-center justify-between text-muted-foreground text-xs md:text-sm">
               <span>{product.reviews} reviews</span>
-              <Badge variant="secondary" className={`text-xs ${compact ? 'px-1 py-0.5' : ''}`}>Natural & Safe</Badge>
+              <Badge variant="secondary" className="text-xs px-2 py-0.5">Natural & Safe</Badge>
             </div>
           </CardContent>
-          <CardFooter className={`pt-0 space-y-1 ${compact ? 'p-1' : 'p-4 sm:p-6'} flex-col gap-1 w-full`}>
-            <div className="flex flex-col gap-1 w-full">
+          <CardFooter className="pt-0 flex-col gap-2 w-full px-4 md:px-6 pb-4 md:pb-6">
+            <div className="flex flex-col gap-2 w-full">
               {/* View Details Button */}
               {(product.id ?? product._id) !== undefined && (product.id ?? product._id) !== null && (
                 <Button
-                  size={compact ? 'sm' : 'lg'}
-                  className={`w-full font-semibold py-2 px-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${compact ? 'text-xs' : ''}`}
+                  size="lg"
+                  className="w-full font-semibold py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 bg-primary text-white text-base md:text-lg"
                   asChild
                 >
                   <Link to={`/product/${product.id ?? product._id}`}>
@@ -88,20 +89,20 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
               )}
               {/* Call Now Button */}
               <Button
-                size={compact ? 'sm' : 'lg'}
+                size="lg"
                 variant="outline"
-                className={`w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold py-2 px-2 rounded-lg transition-all duration-200 ${compact ? 'text-xs' : ''}`}
+                className="w-full border-primary text-primary hover:bg-primary hover:text-white font-semibold py-2 rounded-lg transition-all duration-200 text-base md:text-lg"
                 asChild
               >
                 <a href={`tel:${phoneNumber}`} className="flex items-center justify-center space-x-1">
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-5 w-5" />
                   <span>Call Now</span>
                 </a>
               </Button>
               {/* WhatsApp Button */}
               <Button
-                size={compact ? 'sm' : 'lg'}
-                className={`w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${compact ? 'text-xs' : ''}`}
+                size="lg"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg shadow-md hover:shadow-xl transition-all duration-200 text-base md:text-lg"
                 asChild
               >
                 <a
@@ -110,7 +111,7 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center space-x-1"
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-5 w-5" />
                   <span>WhatsApp</span>
                 </a>
               </Button>

@@ -1,96 +1,91 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Star, Phone, MessageCircle, Leaf, Calendar, Eye } from 'lucide-react';
-import ProductDetailModal from './ProductDetailModal';
-import Autoplay from 'embla-carousel-autoplay';
-import { Skeleton } from '@/components/ui/skeleton';
-import { apiUrl, getImageUrl } from '@/lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface CarouselSettings {
-  content?: {
-    autoplay_delay?: number;
-    show_consultation_slide?: boolean;
-    consultation_title?: string;
-    consultation_subtitle?: string;
-    consultation_button_text?: string;
-  };
-}
+const banners = [
+  {
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80',
+    title: 'Holistic Healing with Ayurveda',
+    subtitle: 'Experience the wisdom of ancient Ayurveda for a healthier, balanced life. Personalized care from our expert male doctors.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=1600&q=80',
+    title: 'Empowering Wellness for Women',
+    subtitle: 'Our female Ayurvedic specialists guide you on your journey to natural wellness and vitality.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=1600&q=80',
+    title: 'Trusted Ayurvedic Team',
+    subtitle: 'A dedicated team of Ayurvedic doctors committed to your holistic well-being and natural healing.',
+  },
+];
+
+const AUTO_SLIDE_INTERVAL = 4000;
 
 const HeroCarousel = () => {
-  const [banners, setBanners] = useState<any[]>([]);
   const [current, setCurrent] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const AUTO_SLIDE_INTERVAL = 4000;
 
   useEffect(() => {
-    fetchBanners();
-  }, []);
-
-  const fetchBanners = async () => {
-    try {
-      const res = await fetch(apiUrl('/api/banners'));
-      const data = await res.json();
-      setBanners(data || []);
-    } catch (error) {
-      setBanners([]);
-    }
-  };
-
-  useEffect(() => {
-    if (banners.length > 1) {
-      timeoutRef.current = setTimeout(() => {
-        setCurrent((prev) => (prev + 1) % banners.length);
-      }, AUTO_SLIDE_INTERVAL);
-      return () => clearTimeout(timeoutRef.current!);
-    }
-  }, [current, banners.length]);
-
-  if (!banners.length) {
-    return (
-      <section className="relative w-full bg-gradient-to-br from-amber-50 via-green-50 to-emerald-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[260px] md:h-[480px] lg:h-[540px] flex items-center justify-center">
-          <span className="text-lg text-muted-foreground">No banners available</span>
-        </div>
-      </section>
-    );
-  }
+    timeoutRef.current = setTimeout(() => {
+      setCurrent((prev) => (prev + 1) % banners.length);
+    }, AUTO_SLIDE_INTERVAL);
+    return () => clearTimeout(timeoutRef.current!);
+  }, [current]);
 
   return (
-    <section className="relative w-full overflow-hidden">
-      <div className="relative w-full h-[260px] md:h-[480px] lg:h-[540px] bg-white flex items-center justify-center">
-        {banners[current].image ? (
-          <img
-            src={getImageUrl(banners[current].image)}
-            alt={banners[current].title || 'Banner'}
-            className="w-full h-full object-contain object-center shadow-xl transition-all duration-700 md:rounded-2xl"
-            style={{ background: '#fff', maxHeight: '100%', maxWidth: '100%' }}
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-green-200 to-emerald-100 shadow-xl p-3 md:p-8 text-center md:rounded-2xl">
-            <div className="flex-1 flex flex-col items-center md:items-start justify-center">
-              <h2 className="text-lg sm:text-xl md:text-4xl font-bold text-primary mb-2 md:mb-4 break-words max-w-xs md:max-w-full mx-auto md:mx-0">
+    <section className="relative w-full md:w-screen md:left-1/2 md:right-1/2 md:-ml-[50vw] md:-mr-[50vw] overflow-hidden">
+      <div className="relative w-full aspect-[3/4] sm:aspect-[16/9] md:w-screen md:aspect-auto md:h-[480px] lg:h-[600px] flex items-center justify-center">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 w-full h-full flex items-center justify-center"
+          >
+            <img
+              src={banners[current].image}
+              alt={banners[current].title}
+              className="w-full h-full max-w-full object-cover object-center"
+              style={{ filter: 'brightness(0.7)' }}
+            />
+            {/* Overlayed content */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 py-6 sm:py-10">
+              <motion.h2
+                className="text-white text-2xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg mb-2"
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.7 }}
+                key={banners[current].title}
+              >
                 {banners[current].title}
-              </h2>
-              <p className="text-xs sm:text-base md:text-xl text-muted-foreground mb-3 md:mb-6 max-w-xs md:max-w-xl mx-auto md:mx-0 break-words">
+              </motion.h2>
+              <motion.p
+                className="text-white text-base sm:text-xl md:text-2xl font-medium drop-shadow mb-4"
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.7 }}
+                key={banners[current].subtitle}
+              >
                 {banners[current].subtitle}
-              </p>
-              {banners[current].cta && (
-                <a href={banners[current].ctaLink || '/contact'}>
-                  <button className="px-4 py-2 md:px-6 md:py-3 bg-primary text-white rounded-lg font-semibold text-sm md:text-lg shadow hover:bg-primary/90 transition-all w-full md:w-auto">
-                    {banners[current].cta}
-                  </button>
-                </a>
-              )}
+              </motion.p>
+              <motion.a
+                href="/products"
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.7 }}
+                key="shop-products-btn"
+              >
+                <button className="px-6 py-3 bg-primary text-white rounded-lg font-semibold text-lg shadow-lg hover:bg-primary/90 transition-all">
+                  Shop Products
+                </button>
+              </motion.a>
             </div>
-          </div>
-        )}
+          </motion.div>
+        </AnimatePresence>
         {/* Dot navigation */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10 mb-2">
           {banners.map((_, idx) => (
             <button
               key={idx}

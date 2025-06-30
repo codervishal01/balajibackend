@@ -202,8 +202,8 @@ const Index = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section id="products" className="py-4 bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+      <section id="products" className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] py-4 bg-secondary/30 overflow-x-hidden">
+        <div className="w-full px-2 sm:px-4 lg:px-6">
           <div className="text-center mb-2">
             <h2 className="text-lg md:text-xl font-bold text-foreground mb-1">
               {featuredProductsContent?.title || "Featured Products"}
@@ -230,19 +230,6 @@ const Index = () => {
                 <ArrowRight className="h-5 w-5" />
               </a>
             </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Sliding Reviews Section */}
-      <section className="py-3 bg-gradient-to-br from-accent/10 to-primary/5">
-        <div className="max-w-3xl mx-auto px-2 sm:px-4 lg:px-6">
-          <div className="relative">
-            <div className="w-full overflow-hidden rounded-2xl shadow-xl">
-              <div className="relative">
-                <AutoSlidingReviewCarousel imagesOnly compact={false} />
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -296,9 +283,22 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Sliding Reviews Section */}
+      <section className="py-3 bg-gradient-to-br from-accent/10 to-primary/5">
+        <div className="max-w-3xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="relative">
+            <div className="w-full overflow-hidden rounded-2xl shadow-xl">
+              <div className="relative">
+                <AutoSlidingReviewCarousel />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section id="contact" className="py-16 gradient-bg text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full text-center px-0 sm:px-0 lg:px-0">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Start Your Wellness Journey?
           </h2>

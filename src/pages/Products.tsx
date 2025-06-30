@@ -113,7 +113,7 @@ const Products = () => {
 
       {/* Products Grid */}
       <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           {transformedProducts.length > 0 ? (
             <>
               <div className="mb-6">
@@ -124,7 +124,7 @@ const Products = () => {
                 </p>
               </div>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {transformedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

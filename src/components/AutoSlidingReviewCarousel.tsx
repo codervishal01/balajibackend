@@ -1,89 +1,78 @@
-import { useEffect, useRef, useState } from 'react';
-import { apiUrl, getImageUrl } from '@/lib/api';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const reviews = [
+  {
+    name: 'Rajesh Verma',
+    image: 'https://images.pexels.com/photos/1707828/pexels-photo-1707828.jpeg?auto=compress&w=160&q=80',
+    text: 'I have been using their Ayurvedic products for 3 months. My digestion has improved a lot. Highly recommended!',
+    city: 'Delhi'
+  },
+  {
+    name: 'Amit Sharma',
+    image: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&w=160&q=80',
+    text: 'Very genuine and effective medicines. The doctor gave me great advice for my skin problems.',
+    city: 'Mumbai'
+  },
+  {
+    name: 'Vikas Patel',
+    image: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&w=160&q=80',
+    text: 'Fast delivery and good customer support. My joint pain is much better now.',
+    city: 'Ahmedabad'
+  },
+  {
+    name: 'Sunita Reddy',
+    image: 'https://images.pexels.com/photos/1181696/pexels-photo-1181696.jpeg?auto=compress&w=160&q=80',
+    text: 'I trust Balaji Healthcare for my family. Natural and safe products.',
+    city: 'Hyderabad'
+  },
+];
 
 const AUTO_SLIDE_INTERVAL = 4000;
 
-interface AutoSlidingReviewCarouselProps {
-  imagesOnly?: boolean;
-  compact?: boolean;
-}
-
-export default function AutoSlidingReviewCarousel({ imagesOnly = false, compact = false }: AutoSlidingReviewCarouselProps) {
-  const [reviews, setReviews] = useState<any[]>([]);
+export default function AutoSlidingReviewCarousel() {
   const [current, setCurrent] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const fetchReviews = async () => {
-    try {
-      const res = await fetch(apiUrl('/api/reviews'));
-      const data = await res.json();
-      setReviews(data || []);
-    } catch (error) {
-      setReviews([]);
-    }
-  };
-
-  useEffect(() => {
-    if (reviews.length > 1) {
-      timeoutRef.current = setTimeout(() => {
-        setCurrent((prev) => (prev + 1) % reviews.length);
-      }, AUTO_SLIDE_INTERVAL);
-      return () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      };
-    }
-  }, [current, reviews.length]);
-
-  if (!reviews.length) {
-    return (
-      <div className="relative w-full h-80 flex items-center justify-center">
-        <span className="text-lg text-muted-foreground">No reviews available</span>
-      </div>
-    );
-  }
+    timeoutRef.current = setTimeout(() => {
+      setCurrent((prev) => (prev + 1) % reviews.length);
+    }, AUTO_SLIDE_INTERVAL);
+    return () => clearTimeout(timeoutRef.current!);
+  }, [current]);
 
   return (
-    <div className={`flex items-center justify-center w-full ${compact ? 'py-2' : 'py-6'}`}>
-      <div className={`flex gap-0 w-full overflow-x-auto items-center ${compact ? 'h-32' : 'h-36 md:h-48'}`}>
-        {reviews.map((review, idx) => (
-          <div
-            key={idx}
-            className={`absolute inset-0 transition-opacity duration-700 ${idx === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+    <div className="w-full flex flex-col items-center justify-center py-8">
+      <div className="w-full max-w-xl min-h-[220px] sm:min-h-[280px] md:min-h-[400px] relative">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-xl p-4 sm:p-8 md:p-12 w-full h-full md:absolute md:inset-0"
           >
-            {imagesOnly ? (
-              <div className="flex items-center justify-center h-full w-full">
-                <img
-                  src={getImageUrl(review.image)}
-                  alt={`Customer review ${idx + 1}`}
-                  className={`rounded-lg object-contain mx-auto ${compact ? 'h-32 w-32' : 'h-48 w-48 md:h-64 md:w-64'}`}
-                  style={{ maxWidth: '100%' }}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col md:flex-row items-center justify-center h-full bg-white/90 shadow-2xl p-6 md:p-10 rounded-2xl">
-                <img
-                  src={getImageUrl(review.image)}
-                  alt={`Customer review ${idx + 1}`}
-                  className={`w-48 h-48 md:w-64 md:h-64 object-cover rounded-full shadow-lg mb-6 md:mb-0 md:mr-10 border-4 border-primary ${compact ? 'h-32 w-32' : 'h-48 w-48 md:h-64 md:w-64'}`}
-                />
-                {/* Text and name would go here if not imagesOnly */}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      {/* Dots navigation */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {reviews.map((_, idx) => (
-          <span
-            key={idx}
-            className={`w-3 h-3 rounded-full ${idx === current ? 'bg-primary' : 'bg-muted-foreground/30'} transition-colors`}
-          />
-        ))}
+            <img
+              src={reviews[current].image}
+              alt={reviews[current].name}
+              className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow mb-4"
+            />
+            <p className="text-lg text-foreground font-medium mb-2">"{reviews[current].text}"</p>
+            <div className="text-sm text-muted-foreground mb-1 font-semibold">- {reviews[current].name}, {reviews[current].city}</div>
+          </motion.div>
+        </AnimatePresence>
+        {/* Dots navigation */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {reviews.map((_, idx) => (
+            <button
+              key={idx}
+              className={`w-3 h-3 rounded-full ${idx === current ? 'bg-primary' : 'bg-gray-300'}`}
+              onClick={() => setCurrent(idx)}
+              aria-label={`Go to review ${idx + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

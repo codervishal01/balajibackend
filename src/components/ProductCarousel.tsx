@@ -33,16 +33,16 @@ const ProductCarousel = () => {
   return (
     <div className="w-full">
       <Carousel plugins={[Autoplay({ delay: 4000 })]}>
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="gap-x-6 md:gap-x-8 px-2 md:px-4">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, idx) => (
-              <CarouselItem key={idx} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={idx} className="min-w-[320px] md:min-w-[350px] lg:min-w-[370px]">
                 <Skeleton className="h-64 w-full rounded-lg" />
               </CarouselItem>
             ))
           ) : (
             featuredProducts.map((product) => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={product.id} className="min-w-[320px] md:min-w-[350px] lg:min-w-[370px]">
                 <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-border/50 overflow-hidden bg-white/80 backdrop-blur-sm">
                   <CardHeader className="p-0">
                     <div className="relative overflow-hidden rounded-t-lg">
