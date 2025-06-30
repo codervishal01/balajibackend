@@ -1,45 +1,73 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const reviews = [
-  {
-    name: 'Rajesh Verma',
-    image: 'https://images.pexels.com/photos/1707828/pexels-photo-1707828.jpeg?auto=compress&w=160&q=80',
-    text: 'I have been using their Ayurvedic products for 3 months. My digestion has improved a lot. Highly recommended!',
-    city: 'Delhi'
-  },
-  {
-    name: 'Amit Sharma',
-    image: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&w=160&q=80',
-    text: 'Very genuine and effective medicines. The doctor gave me great advice for my skin problems.',
-    city: 'Mumbai'
-  },
-  {
-    name: 'Vikas Patel',
-    image: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&w=160&q=80',
-    text: 'Fast delivery and good customer support. My joint pain is much better now.',
-    city: 'Ahmedabad'
-  },
-  {
-    name: 'Sunita Reddy',
-    image: 'https://images.pexels.com/photos/1181696/pexels-photo-1181696.jpeg?auto=compress&w=160&q=80',
-    text: 'I trust Balaji Healthcare for my family. Natural and safe products.',
-    city: 'Hyderabad'
-  },
-];
+import { apiUrl, getImageUrl } from '@/lib/api';
 
 const AUTO_SLIDE_INTERVAL = 4000;
 
 export default function AutoSlidingReviewCarousel() {
+  const [reviews, setReviews] = useState<any[]>([]);
   const [current, setCurrent] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    const fetchReviews = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch(apiUrl('/api/reviews'));
+        if (!res.ok) throw new Error('Failed to fetch reviews');
+        const data = await res.json();
+        setReviews(Array.isArray(data) ? data : []);
+      } catch (err: any) {
+        setError(err.message || 'Error loading reviews');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  useEffect(() => {
+    if (!reviews.length) return;
     timeoutRef.current = setTimeout(() => {
       setCurrent((prev) => (prev + 1) % reviews.length);
     }, AUTO_SLIDE_INTERVAL);
     return () => clearTimeout(timeoutRef.current!);
-  }, [current]);
+  }, [current, reviews.length]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-8">
+        <div className="w-full max-w-xl min-h-[220px] flex items-center justify-center">
+          <span className="text-muted-foreground">Loading reviews...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-8">
+        <div className="w-full max-w-xl min-h-[220px] flex items-center justify-center">
+          <span className="text-destructive">{error}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!reviews.length) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-8">
+        <div className="w-full max-w-xl min-h-[220px] flex items-center justify-center">
+          <span className="text-muted-foreground">No reviews yet.</span>
+        </div>
+      </div>
+    );
+  }
+
+  const currentReview = reviews[current];
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-8">
@@ -54,12 +82,14 @@ export default function AutoSlidingReviewCarousel() {
             className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-xl p-4 sm:p-8 md:p-12 w-full h-full md:absolute md:inset-0"
           >
             <img
-              src={reviews[current].image}
-              alt={reviews[current].name}
+              src={getImageUrl(currentReview.image)}
+              alt={currentReview.name || 'Customer'}
               className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow mb-4"
             />
-            <p className="text-lg text-foreground font-medium mb-2">"{reviews[current].text}"</p>
-            <div className="text-sm text-muted-foreground mb-1 font-semibold">- {reviews[current].name}, {reviews[current].city}</div>
+            <p className="text-lg text-foreground font-medium mb-2">"{currentReview.text}"</p>
+            <div className="text-sm text-muted-foreground mb-1 font-semibold">
+              - {currentReview.name || 'Customer'}{currentReview.city ? `, ${currentReview.city}` : ''}
+            </div>
           </motion.div>
         </AnimatePresence>
         {/* Dots navigation */}
