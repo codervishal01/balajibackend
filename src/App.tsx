@@ -18,11 +18,31 @@ import NotFound from "./pages/NotFound";
 import { useLocation } from "react-router-dom";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import { useState, useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showLoader) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        {/* Dummy loader, replace with GIF later */}
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />
+          <span className="text-lg font-semibold text-primary">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-screen min-h-screen flex flex-col bg-background overflow-x-hidden">
       <Navigation />

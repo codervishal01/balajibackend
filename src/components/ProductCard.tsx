@@ -27,11 +27,11 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
     <Card className={`group hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 border-none overflow-hidden rounded-2xl bg-white/90 backdrop-blur-md min-w-[280px] max-w-[370px] mx-auto`}>
       <div className="flex flex-col">
         {/* Image Section */}
-        <div className="relative w-full h-56 md:h-64 lg:h-72 overflow-hidden">
+        <div className="relative w-full h-72 md:h-64 lg:h-72 overflow-hidden">
           <img
             src={getImageUrl(product.image)}
             alt={product.name}
-            className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-full object-contain md:object-cover object-center transition-transform duration-300 group-hover:scale-110"
           />
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -73,7 +73,7 @@ const ProductCard = ({ product, compact = false }: ProductCardProps) => {
               <Badge variant="secondary" className="text-xs px-2 py-0.5">Natural & Safe</Badge>
             </div>
           </CardContent>
-          <CardFooter className="pt-0 flex-col gap-2 w-full px-4 md:px-6 pb-4 md:pb-6">
+          <CardFooter className="pt-0 flex-col gap-2 w-full px-6 md:px-8 pb-4 md:pb-6">
             <div className="flex flex-col gap-2 w-full">
               {/* View Details Button */}
               {(product.id ?? product._id) !== undefined && (product.id ?? product._id) !== null && (

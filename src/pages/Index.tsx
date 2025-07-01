@@ -212,14 +212,18 @@ const Index = () => {
               {featuredProductsContent?.description || "Discover our most popular Ayurvedic formulations, crafted with authentic ingredients and time-tested recipes."}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-2 justify-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 mb-2">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
-                <ProductSkeleton key={index} />
+                <div key={index} className="w-full sm:max-w-[320px] md:max-w-[350px] lg:max-w-[370px] flex-shrink-0">
+                  <ProductSkeleton />
+                </div>
               ))
             ) : (
               allProducts.map((product: any) => (
-                <ProductCard key={product.id} product={product} />
+                <div key={product.id} className="w-full sm:max-w-[320px] md:max-w-[350px] lg:max-w-[370px] flex-shrink-0">
+                  <ProductCard product={product} />
+                </div>
               ))
             )}
           </div>
